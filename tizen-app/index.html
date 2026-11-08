@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#090b10">
+  <title>Streambert TV</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand focusable" id="brandHome" aria-label="Streambert TV home"><span class="brand-mark">S</span><span>STREAMBERT</span></button>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item focusable active" data-view="home">Home</button>
+        <button class="nav-item focusable" data-view="search">Search</button>
+        <button class="nav-item focusable" data-view="watchlist">My List <span id="watchlistCount">0</span></button>
+        <button class="nav-item focusable" data-view="settings">Settings</button>
+      </nav>
+      <div class="profile-mark" aria-hidden="true">TV</div>
+    </header>
+
+    <main id="mainContent">
+      <div id="statusBanner" class="status-banner" role="status" aria-live="polite"></div>
+      <section id="homeView" class="view">
+        <div class="hero" id="hero">
+          <div class="hero-shade"></div>
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="live-dot"></span> YOUR ENTERTAINMENT, YOUR WAY</div>
+            <h1 id="heroTitle">Welcome to Streambert</h1>
+            <p id="heroOverview">Connect your TMDB token in Settings to explore trending movies and series.</p>
+            <div class="hero-actions">
+              <button id="heroExplore" class="button button-primary focusable">Explore titles</button>
+              <button id="heroSearch" class="button button-glass focusable">Search</button>
+            </div>
+          </div>
+          <div class="hero-gradient"></div>
+        </div>
+        <div id="homeRows"></div>
+      </section>
+
+      <section id="searchView" class="view hidden">
+        <div class="page-heading"><p class="eyebrow">FIND YOUR NEXT WATCH</p><h1>Search</h1></div>
+        <form id="searchForm" class="search-form">
+          <label class="sr-only" for="searchInput">Search movies and TV shows</label>
+          <input id="searchInput" class="focusable" type="search" placeholder="Search movies and TV shows" autocomplete="off">
+          <button class="button button-primary focusable" type="submit">Search</button>
+        </form>
+        <div id="searchResults" class="media-grid"></div>
+      </section>
+
+      <section id="watchlistView" class="view hidden">
+        <div class="page-heading"><p class="eyebrow">SAVED FOR LATER</p><h1>My List</h1></div>
+        <div id="watchlistResults" class="media-grid"></div>
+        <div id="watchlistEmpty" class="empty-state hidden"><div class="empty-icon">＋</div><h2>Your list is waiting</h2><p>Save a title from its details page and it will appear here.</p><button class="button button-primary focusable" data-go-view="home">Browse titles</button></div>
+      </section>
+
+      <section id="detailsView" class="view hidden">
+        <button id="detailsBack" class="back-link focusable">← Back to titles</button>
+        <div class="details-layout">
+          <div class="details-poster" id="detailsPoster"></div>
+          <div class="details-copy">
+            <p class="eyebrow" id="detailsType">MOVIE</p>
+            <h1 id="detailsTitle"></h1>
+            <p class="details-meta" id="detailsMeta"></p>
+            <p class="details-overview" id="detailsOverview"></p>
+            <div class="details-actions">
+              <button id="playAction" class="button button-primary focusable">▶ &nbsp; Play authorized URL</button>
+              <button id="saveAction" class="button button-glass focusable">＋ &nbsp; My List</button>
+            </div>
+            <p class="legal-note">Streambert TV provides metadata only. Use playback URLs for content you are authorized to access.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="playerView" class="view hidden">
+        <div class="player-top"><button id="playerBack" class="back-link focusable">← Back to details</button><span id="playerTitle"></span></div>
+        <video id="videoPlayer" controls playsinline></video>
+        <p id="playerMessage" class="player-message">Playback works with supported direct media URLs only (for example, MP4 or a TV-compatible HLS stream).</p>
+      </section>
+
+      <section id="settingsView" class="view hidden">
+        <div class="page-heading"><p class="eyebrow">PERSONALIZE YOUR TV APP</p><h1>Settings</h1></div>
+        <div class="settings-card">
+          <label for="tmdbToken">TMDB Read Access Token</label>
+          <p>Used to request catalog metadata and artwork directly from TMDB. It is saved in this TV app's local storage.</p>
+          <input id="tmdbToken" class="focusable" type="password" autocomplete="off" placeholder="Paste your TMDB API Read Access Token">
+          <div class="settings-actions"><button id="saveToken" class="button button-primary focusable">Save token</button><button id="clearToken" class="button button-glass focusable">Clear token</button></div>
+          <p id="settingsMessage" class="settings-message" role="status"></p>
+        </div>
+        <p class="attribution">Metadata and images are provided by TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+      </section>
+    </main>
+    <footer class="footer"><span id="connectionStatus">Ready</span><span>Use your remote to navigate · BACK to return</span></footer>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

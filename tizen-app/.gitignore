@@ -1,0 +1,7 @@
+# Tizen project output and local signing material
+.buildResult/
+.tizen-cli-config
+*.wgt
+*.keystore
+*.p12
+*.p12.txt
