@@ -1,75 +1,67 @@
 # Streambert TV
 
-A TV-first Samsung Tizen web app scaffold with a Streambert-inspired dark catalog UI. This is a separate app from the Electron desktop project.
+A TV-first Samsung Tizen web app with a Streambert-inspired charcoal-and-red look. Browse TMDB movie and series metadata, search, inspect title details, and save a persistent local watchlist. It is separate from the Electron desktop app.
 
-## Features
+## TV app features
+- Home page with trending, popular, and top-rated shelves.
+- Dedicated Movies and Series catalogs with genre/sort filters and pagination.
+- Search across TMDB movie and TV catalogs.
+- Detail page with artwork, overview, rating, genres, movie collection recommendations, TV seasons, and similar-title shelves.
+- Persistent watchlist, recently viewed titles, TMDB token, and a time-limited metadata cache stored in a versioned localStorage record. Existing v1 token/watchlist keys are migrated on first launch.
+- Samsung remote/keyboard focus navigation, Back handling, and native video controls for direct media URLs the user is authorized to play.
 
-- Browse and search movie/TV metadata from TMDB.
-- Save a local watchlist on the TV.
-- Navigate with a Samsung TV remote or keyboard.
-- Optional HTML5 playback of a direct media URL that you are authorized to access. The app does not discover, scrape, proxy, or embed third-party streaming sources.
-- Package the web project as a signed Tizen `.wgt` using Tizen Studio.
+TMDB provides catalog metadata and artwork, not video. The app does not discover, scrape, proxy, or embed third-party streaming sources. Playback requires a direct URL to content you are authorized to access, with a format and codec supported by the target TV.
 
-> **Content and rights:** TMDB supplies metadata and artwork, not video. Playback requires a direct MP4 or HLS URL you are authorized to use, and compatibility depends on the TV model and stream format. Do not enter links to unauthorized content. The app does not include media sources.
-
-## Project layout
+## Project structure
 
 ```text
 .
 ├── README.md
 └── tizen-app/
-    ├── config.xml       # Tizen TV web-app manifest
+    ├── config.xml
     ├── index.html
     ├── css/style.css
     ├── js/app.js
     └── scripts/package.sh
 ```
 
-## Requirements
+## Build and install on Samsung TV
 
-- Tizen Studio with the **TV Extensions** and Web App development tools installed.
-- A Samsung account and a TV signing certificate created in Tizen Studio Certificate Manager.
-- A Samsung Tizen TV (or the TV emulator) for testing. Supported codecs and APIs vary by model/year.
-- A TMDB API Read Access Token. The token is stored in this app's local storage on the TV; do not use a shared/public device if you do not trust its users.
-
-## Create a signed WGT
-
-1. Install Tizen Studio from [Samsung Developer](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tizen-studio.html). In Package Manager, install the TV extensions and tools.
-2. Open **Tools → Certificate Manager** and create a Samsung certificate profile. For a real TV, register the TV's DUID as directed by Samsung. Keep private keys private; do not commit them.
-3. In Tizen Studio, choose **File → Import → Tizen → Tizen Project**, import the `tizen-app` directory, and select the TV profile. If using the CLI, make sure `tizen` is on `PATH` and the profile is available:
+1. Install Tizen Studio and the Samsung TV extensions using the [official Smart TV SDK guide](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tizen-studio.html).
+2. In Tizen Studio Certificate Manager create a Samsung TV signing profile. For physical TV installation, follow Samsung's current device-registration steps and add the TV DUID. Never commit your private key or certificate passwords.
+3. Ensure the `tizen` CLI is available in your terminal, and check your signing profile:
 
    ```sh
    tizen version
    tizen certificate-manager list-profiles
    ```
 
-4. From the repository root, build and package using the included helper. Supply the profile name exactly as listed above:
+4. From the repository root, build and package the Tizen web app. Use the profile name exactly as listed by Certificate Manager:
 
    ```sh
-   ./tizen-app/scripts/package.sh "YOUR_CERTIFICATE_PROFILE"
+   ./tizen-app/scripts/package.sh "YOUR_PROFILE_NAME"
    ```
 
-   The script runs `tizen build-web` and `tizen package --type wgt --sign ...`. The generated signed `.wgt` is placed in `tizen-app/.buildResult/` (the precise output location can vary by Tizen Studio version). You can also use **Project → Build Package** in Tizen Studio and choose the same security profile.
-
-5. On the TV, open **Apps**, use the remote's number sequence required by your model to open Developer Mode, enable it, enter the development computer's IP address, and restart the TV. Samsung may change this menu flow between model years; follow the current Samsung TV developer documentation for your model.
-6. Connect the TV and development computer to the same network. Find the TV's device name with `sdb devices`, connect if needed, then install from Tizen Studio Device Manager or CLI:
+   Or import `tizen-app` in Tizen Studio as a Tizen Web Application project, select the TV profile, then use **Project → Build Package**. The resulting signed `.wgt` will be under `tizen-app/.buildResult/` (output details can vary by SDK version).
+5. On the TV, open Apps and enable Developer Mode using the instructions for that TV model/year. Set the development computer's IP and restart if requested. Connect both devices to the same network.
+6. Discover the connected device and install the generated package (replace the example output name with the actual WGT filename):
 
    ```sh
+   sdb devices
    sdb connect TV_IP_ADDRESS:26101
-   tizen install --name tizen-app/.buildResult/StreambertTV.wgt --target DEVICE_NAME
+   tizen install --name tizen-app/.buildResult/ACTUAL_APP_NAME.wgt --target DEVICE_NAME
    ```
 
-   Replace the example WGT path and device name with the actual build output and `sdb devices` result. If your Tizen Studio version uses different option syntax, run `tizen install --help` and use the equivalent options. The TV and app must use a matching trusted certificate for installation.
+   Check `tizen install --help` for the installed SDK's exact CLI flags. The installation certificate must be trusted by the TV. Tizen Studio Device Manager is an alternative for connecting and installing.
+7. Launch Streambert TV. Go to Settings and enter a TMDB API Read Access Token. The catalog and watchlist work only while the TV has suitable network access. Test on the target TV as emulator and browser support may differ from actual model firmware.
 
-7. Launch **Streambert TV** on the TV. Open Settings, enter the TMDB Read Access Token, and save it. Browse, search, and add titles to your watchlist. To test playback, open a title and enter a direct media URL for content you are authorized to play.
+## Local storage and privacy
 
-## Local development
+The app stores a single versioned JSON record (`streambert_tv_data_v2`) in browser localStorage. It includes the user's TMDB token, watchlist, last viewed items, and cached TMDB responses. Cache entries expire after six hours. **Clear watchlist and local data** in Settings removes list/recent/cache data but keeps the token; **Clear token** removes the token and metadata cache. Browser storage can be erased by TV settings or firmware resets. This is local to the app/browser profile and does not sync across devices.
 
-Open `tizen-app` as a Tizen TV Web Application in Tizen Studio and use the TV emulator or a signed physical TV target. The app is static HTML/CSS/JavaScript and has no npm dependencies. Browser testing can help with layout, but it does not replace TV testing: remote key behavior, media codecs, cross-origin restrictions, and TV firmware vary.
+## Limitations
 
-## App limitations
-
-This is a TV-first metadata/watchlist client, not a feature-complete Electron conversion. Desktop downloads, subtitles management, OS integrations, and Electron IPC are intentionally not included. TMDB API credentials and watchlist data are stored locally on the TV. Video playback uses the browser's native `<video>` element and will only work for supported, authorized direct media URLs.
+This is not a feature-complete Electron conversion. Desktop downloads, native OS integrations, and Electron IPC are not part of Tizen. Season browsing currently exposes season metadata only. HLS playback depends on native TV support; this app does not bundle an HLS library or video source. Samsung certification and store release are separate processes.
 
 ## License
 
